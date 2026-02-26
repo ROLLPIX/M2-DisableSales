@@ -26,9 +26,9 @@ bin/magento cache:flush
 
 ### Manual
 
-1. Copy the `app/code/Rollpix/DisableSales` folder into your Magento root installation.
-
-2. Run:
+1. Create the folder `app/code/Rollpix/DisableSales` in your Magento installation.
+2. Copy all files from this repository into that folder.
+3. Run:
 
 ```bash
 bin/magento module:enable Rollpix_DisableSales
@@ -143,7 +143,7 @@ The module is **100% reversible**: simply set Enable = No and flush cache, every
 ### File structure
 
 ```
-app/code/Rollpix/DisableSales/
+rollpix/module-disable-sales/   (repo root)
 ├── registration.php
 ├── composer.json
 ├── etc/
@@ -245,7 +245,8 @@ bin/magento setup:upgrade
 bin/magento cache:flush
 ```
 
-Then remove the `app/code/Rollpix/DisableSales` folder.
+If installed via composer, run `composer remove rollpix/module-disable-sales`.
+If installed manually, remove the `app/code/Rollpix/DisableSales` folder.
 
 No database tables are created or modified. No residue left behind.
 
