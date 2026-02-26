@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="rollpix_disablesales" translate="label" sortOrder="900" showInDefault="1"
+                 showInWebsite="1" showInStore="1">
+            <label>Disable Sales</label>
+            <tab>rollpix</tab>
+            <resource>Rollpix_DisableSales::config</resource>
+            <group id="general" translate="label" sortOrder="10" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>General Settings</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable</label>
+                    <comment>When enabled, sales will be temporarily disabled.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="message" translate="label comment" type="textarea" sortOrder="20"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Message</label>
+                    <comment><![CDATA[Message displayed to customers when sales are disabled. HTML is supported in the banner and modal. Checkout/cart error messages will show plain text only.]]></comment>
+                </field>
+                <field id="disable_checkout" translate="label comment" type="select" sortOrder="25"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Also Disable Checkout</label>
+                    <comment>Block checkout access as an additional safety net.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="banner" translate="label" sortOrder="20" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Top Banner</label>
+                <field id="show_banner" translate="label comment" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Top Banner</label>
+                    <comment>Display a dismissible banner at the top of the page.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="banner_bg_color" translate="label" type="text" sortOrder="20"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Background Color</label>
+                    <validate>color</validate>
+                    <depends>
+                        <field id="show_banner">1</field>
+                    </depends>
+                </field>
+                <field id="banner_text_color" translate="label" type="text" sortOrder="30"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Text Color</label>
+                    <validate>color</validate>
+                    <depends>
+                        <field id="show_banner">1</field>
+                    </depends>
+                </field>
+                <field id="banner_custom_css" translate="label comment" type="textarea" sortOrder="40"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Banner Message Custom CSS</label>
+                    <comment><![CDATA[Inline CSS applied to the banner message text. Modify the defaults as needed.]]></comment>
+                    <depends>
+                        <field id="show_banner">1</field>
+                    </depends>
+                </field>
+            </group>
+            <group id="modal" translate="label" sortOrder="30" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Modal Popup</label>
+                <field id="show_modal" translate="label comment" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Modal</label>
+                    <comment>Display a modal popup once per session.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="modal_bg_color" translate="label" type="text" sortOrder="20"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Background Color</label>
+                    <validate>color</validate>
+                    <depends>
+                        <field id="show_modal">1</field>
+                    </depends>
+                </field>
+                <field id="modal_text_color" translate="label" type="text" sortOrder="30"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Text Color</label>
+                    <validate>color</validate>
+                    <depends>
+                        <field id="show_modal">1</field>
+                    </depends>
+                </field>
+                <field id="modal_custom_css" translate="label comment" type="textarea" sortOrder="40"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Modal Message Custom CSS</label>
+                    <comment><![CDATA[Inline CSS applied to the modal message text. Modify the defaults as needed.]]></comment>
+                    <depends>
+                        <field id="show_modal">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+        <tab id="rollpix" translate="label" sortOrder="400">
+            <label>Rollpix</label>
+        </tab>
+    </system>
+</config>

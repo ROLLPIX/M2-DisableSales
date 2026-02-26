@@ -1,0 +1,70 @@
+<?php
+/**
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Rollpix\DisableSales\ViewModel\SalesStatus $salesStatus
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$salesStatus = $block->getData('sales_status');
+
+if (!$salesStatus->isDisabled()) {
+    return;
+}
+
+$message = $salesStatus->getMessage(); // HTML allowed — admin-controlled content
+$showBanner = $salesStatus->isBannerEnabled();
+$bgColor = $escaper->escapeHtmlAttr($salesStatus->getBannerBgColor());
+$textColor = $escaper->escapeHtmlAttr($salesStatus->getBannerTextColor());
+$bannerCss = $escaper->escapeHtmlAttr($salesStatus->getBannerCustomCss());
+?>
+
+<?php // Hide add-to-cart buttons via inline CSS ?>
+<style>
+    .action.tocart,
+    #product-addtocart-button,
+    button.action.tocart,
+    .product-item-actions .action.tocart {
+        display: none !important;
+    }
+</style>
+
+<?php if ($showBanner): ?>
+<div id="rollpix-disable-sales-banner"
+     style="background-color: <?= /* @noEscape */ $bgColor ?>;
+            color: <?= /* @noEscape */ $textColor ?>;
+            padding: 12px 40px 12px 20px;
+            text-align: center;
+            position: relative;
+            z-index: 1000;">
+    <span<?php if ($bannerCss): ?> style="<?= /* @noEscape */ $bannerCss ?>"<?php endif; ?>><?= /* @noEscape */ $message ?></span>
+    <button type="button"
+            id="rollpix-disable-sales-close"
+            style="position: absolute;
+                   right: 12px;
+                   top: 50%;
+                   transform: translateY(-50%);
+                   background: none;
+                   border: none;
+                   color: <?= /* @noEscape */ $textColor ?>;
+                   font-size: 20px;
+                   cursor: pointer;
+                   padding: 0 4px;
+                   line-height: 1;
+                   opacity: 0.8;"
+            aria-label="<?= $escaper->escapeHtmlAttr(__('Close')) ?>">
+        &times;
+    </button>
+</div>
+<script>
+    (function () {
+        var banner = document.getElementById('rollpix-disable-sales-banner');
+        var closeBtn = document.getElementById('rollpix-disable-sales-close');
+        if (localStorage.getItem('rollpix_banner_closed') === '1') {
+            banner.style.display = 'none';
+        }
+        closeBtn.addEventListener('click', function () {
+            banner.style.display = 'none';
+            localStorage.setItem('rollpix_banner_closed', '1');
+        });
+    })();
+</script>
+<?php endif; ?>

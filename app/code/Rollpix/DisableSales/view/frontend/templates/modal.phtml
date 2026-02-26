@@ -1,0 +1,87 @@
+<?php
+/**
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Rollpix\DisableSales\ViewModel\SalesStatus $salesStatus
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$salesStatus = $block->getData('sales_status');
+
+if (!$salesStatus->isDisabled() || !$salesStatus->isModalEnabled()) {
+    return;
+}
+
+$message = $salesStatus->getMessage(); // HTML allowed — admin-controlled content
+$modalBgColor = $escaper->escapeHtmlAttr($salesStatus->getModalBgColor());
+$modalTextColor = $escaper->escapeHtmlAttr($salesStatus->getModalTextColor());
+$modalCss = $escaper->escapeHtmlAttr($salesStatus->getModalCustomCss());
+?>
+
+<style>
+    /* Overlay: z-index máximo */
+    .modals-wrapper .rollpix-disable-sales-modal.modal-popup {
+        z-index: 99999 !important;
+    }
+    .rollpix-disable-sales-modal._show .modal-overlay,
+    .modals-overlay[style] {
+        z-index: 99998 !important;
+    }
+
+    /* Centrado vertical */
+    .rollpix-disable-sales-modal.modal-popup {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+    }
+    .rollpix-disable-sales-modal.modal-popup._show {
+        pointer-events: auto;
+    }
+
+    /* Inner wrap */
+    .rollpix-disable-sales-modal .modal-inner-wrap {
+        width: 90%;
+        max-width: 600px;
+        margin: 0 auto;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: <?= /* @noEscape */ $modalBgColor ?>;
+        color: <?= /* @noEscape */ $modalTextColor ?>;
+        position: relative;
+        transform: none !important;
+        top: auto !important;
+    }
+    .rollpix-disable-sales-modal .modal-header {
+        padding: 12px 16px 0;
+        border-bottom: none;
+    }
+    .rollpix-disable-sales-modal .modal-header .action-close {
+        position: absolute;
+        right: 8px;
+        top: 8px;
+    }
+    .rollpix-disable-sales-modal .modal-content {
+        padding: 24px 32px;
+        overflow: visible;
+        max-height: none;
+    }
+    .rollpix-disable-sales-modal .modal-footer {
+        padding: 0 32px 28px;
+        text-align: center;
+        border-top: none;
+    }
+    .rollpix-disable-sales-modal .modal-footer .action.primary {
+        min-width: 160px;
+    }
+</style>
+
+<div id="rollpix-disable-sales-modal" style="display:none;">
+    <div<?php if ($modalCss): ?> style="<?= /* @noEscape */ $modalCss ?>"<?php endif; ?>><?= /* @noEscape */ $message ?></div>
+</div>
+
+<script type="text/x-magento-init">
+{
+    "*": {
+        "Rollpix_DisableSales/js/disable-sales-modal": {}
+    }
+}
+</script>

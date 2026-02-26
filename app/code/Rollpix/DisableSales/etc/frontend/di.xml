@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Block add-to-cart controller action -->
+    <type name="Magento\Checkout\Controller\Cart\Add">
+        <plugin name="rollpix_disablesales_cart_add"
+                type="Rollpix\DisableSales\Plugin\Cart\AddPlugin"
+                sortOrder="10"/>
+    </type>
+
+    <!-- Block checkout page access -->
+    <type name="Magento\Checkout\Controller\Index\Index">
+        <plugin name="rollpix_disablesales_checkout_index"
+                type="Rollpix\DisableSales\Plugin\Checkout\DisableCheckoutPlugin"
+                sortOrder="10"/>
+    </type>
+
+    <type name="Magento\Checkout\Controller\Onepage\Index">
+        <plugin name="rollpix_disablesales_checkout_onepage"
+                type="Rollpix\DisableSales\Plugin\Checkout\DisableCheckoutPlugin"
+                sortOrder="10"/>
+    </type>
+</config>

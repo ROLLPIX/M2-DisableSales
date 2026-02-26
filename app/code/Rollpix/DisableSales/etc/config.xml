@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <rollpix_disablesales>
+            <general>
+                <enabled>0</enabled>
+                <message><![CDATA[Debido a la alta demanda, las compras están temporalmente suspendidas. Podés seguir navegando el catálogo. ¡Volvé pronto!]]></message>
+                <disable_checkout>1</disable_checkout>
+            </general>
+            <banner>
+                <show_banner>1</show_banner>
+                <banner_bg_color>#ff6b35</banner_bg_color>
+                <banner_text_color>#ffffff</banner_text_color>
+                <banner_custom_css>font-size: 14px; line-height: 1.4;</banner_custom_css>
+            </banner>
+            <modal>
+                <show_modal>0</show_modal>
+                <modal_bg_color>#ffffff</modal_bg_color>
+                <modal_text_color>#333333</modal_text_color>
+                <modal_custom_css>font-size: 18px; line-height: 1.6; text-align: center; padding: 10px 20px;</modal_custom_css>
+            </modal>
+        </rollpix_disablesales>
+    </default>
+</config>
