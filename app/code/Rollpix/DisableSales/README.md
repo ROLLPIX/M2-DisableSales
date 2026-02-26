@@ -1,17 +1,21 @@
 # Rollpix_DisableSales
 
-Modulo Magento 2 para deshabilitar temporalmente las ventas en una tienda online sin afectar la navegacion del catalogo. Ideal para situaciones de alta demanda, mantenimiento, o cuando se necesita pausar las compras sin bajar el sitio.
+> **[Version en español](README.es.md)**
 
-## Compatibilidad
+**SPONSOR:** [www.rollpix.com](https://www.rollpix.com)
 
-| Requisito | Versiones soportadas |
+Magento 2 module to temporarily disable sales in an online store without affecting catalog navigation. Ideal for high-demand situations, maintenance, or when you need to pause purchases without taking the site down.
+
+## Compatibility
+
+| Requirement | Supported versions |
 |---|---|
 | PHP | 7.4 ~ 8.3 |
 | Magento | 2.4.x (Open Source / Commerce) |
 
-## Instalacion
+## Installation
 
-### Via composer (recomendado)
+### Via composer (recommended)
 
 ```bash
 composer require rollpix/module-disable-sales
@@ -22,9 +26,9 @@ bin/magento cache:flush
 
 ### Manual
 
-1. Copiar la carpeta `app/code/Rollpix/DisableSales` en la raiz de tu instalacion Magento.
+1. Copy the `app/code/Rollpix/DisableSales` folder into your Magento root installation.
 
-2. Ejecutar:
+2. Run:
 
 ```bash
 bin/magento module:enable Rollpix_DisableSales
@@ -34,109 +38,109 @@ bin/magento cache:flush
 
 ---
 
-## Configuracion en el Admin
+## Admin Configuration
 
-Ir a **Stores > Configuration > Rollpix > Disable Sales**.
+Go to **Stores > Configuration > Rollpix > Disable Sales**.
 
-![Configuracion en el Admin](docs/admin-config.jpg)
+![Admin Configuration](docs/admin-config.jpg)
 
-La configuracion se divide en tres secciones:
+Configuration is divided into three sections:
 
-### Configuracion General
+### General Settings
 
-| Campo | Tipo | Default | Descripcion |
+| Field | Type | Default | Description |
 |---|---|---|---|
-| **Habilitar** | Si/No | No | Activa o desactiva el bloqueo de ventas |
-| **Mensaje** | Textarea | _(ver abajo)_ | Mensaje que se muestra al cliente. Soporta HTML en banner y modal. En errores de checkout/carrito se muestra como texto plano |
-| **Deshabilitar tambien el Checkout** | Si/No | Si | Bloquea el acceso al checkout como red de seguridad adicional |
+| **Enable** | Yes/No | No | Activate or deactivate sales blocking |
+| **Message** | Textarea | _(see below)_ | Message shown to customers. Supports HTML in the banner and modal. Checkout/cart error messages display as plain text |
+| **Also Disable Checkout** | Yes/No | Yes | Block checkout access as an additional safety net |
 
-**Mensaje por defecto:**
+**Default message:**
 > Debido a la alta demanda, las compras estan temporalmente suspendidas. Podes seguir navegando el catalogo. Volve pronto!
 
-El campo mensaje acepta **HTML**. Podes usar `<strong>`, `<br>`, `<a href="...">`, etc. El HTML se renderiza en el banner superior y en el modal. Los mensajes de error que aparecen en el checkout y carrito (via Magento message manager) se muestran como texto plano automaticamente.
+The message field supports **HTML**. You can use `<strong>`, `<br>`, `<a href="...">`, etc. HTML renders in the top banner and modal. Error messages shown in checkout and cart (via Magento message manager) automatically display as plain text.
 
-### Banner Superior (Top Banner)
+### Top Banner
 
-| Campo | Tipo | Default | Descripcion |
+| Field | Type | Default | Description |
 |---|---|---|---|
-| **Mostrar Banner Superior** | Si/No | Si | Muestra un banner descartable en la parte superior de la pagina |
-| **Color de Fondo** | Color | `#ff6b35` | Color de fondo del banner (formato hex) |
-| **Color de Texto** | Color | `#ffffff` | Color del texto del banner (formato hex) |
-| **CSS Personalizado del Banner** | Textarea | `font-size: 14px; line-height: 1.4;` | CSS inline aplicado al texto del mensaje. Viene pre-cargado con los valores por defecto para facilitar la edicion |
+| **Show Top Banner** | Yes/No | Yes | Display a dismissible banner at the top of the page |
+| **Background Color** | Color | `#ff6b35` | Banner background color (hex format) |
+| **Text Color** | Color | `#ffffff` | Banner text color (hex format) |
+| **Banner Message Custom CSS** | Textarea | `font-size: 14px; line-height: 1.4;` | Inline CSS applied to the message text. Pre-loaded with defaults for easy editing |
 
-El banner tiene un boton de cerrar (X). Una vez cerrado, no se vuelve a mostrar en esa sesion del navegador (usa `localStorage`). Se resetea limpiando localStorage o abriendo una ventana de incognito.
+The banner has a close button (X). Once closed, it won't show again in that browser session (uses `localStorage`). Reset by clearing localStorage or opening an incognito window.
 
 ### Modal Popup
 
-| Campo | Tipo | Default | Descripcion |
+| Field | Type | Default | Description |
 |---|---|---|---|
-| **Mostrar Modal** | Si/No | No | Muestra un popup modal una vez por sesion |
-| **Color de Fondo** | Color | `#ffffff` | Color de fondo del modal |
-| **Color de Texto** | Color | `#333333` | Color del texto del modal |
-| **CSS Personalizado del Modal** | Textarea | `font-size: 18px; line-height: 1.6; text-align: center; padding: 10px 20px;` | CSS inline aplicado al texto del mensaje del modal. Viene pre-cargado con los valores por defecto |
+| **Show Modal** | Yes/No | No | Display a modal popup once per session |
+| **Background Color** | Color | `#ffffff` | Modal background color |
+| **Text Color** | Color | `#333333` | Modal text color |
+| **Modal Message Custom CSS** | Textarea | `font-size: 18px; line-height: 1.6; text-align: center; padding: 10px 20px;` | Inline CSS applied to the modal message text. Pre-loaded with defaults |
 
-El modal se muestra centrado en pantalla, con un ancho maximo de 600px. Aparece una sola vez por sesion del navegador (usa `sessionStorage`). Incluye un boton "Entendido" para cerrarlo.
+The modal is displayed centered on screen, with a max-width of 600px. It appears once per browser session (uses `sessionStorage`). Includes an "Entendido" (Got it) button to close.
 
-**Banner y Modal pueden estar activos al mismo tiempo.** Son independientes entre si.
-
----
-
-## Que hace el modulo cuando esta activo
-
-### 1. Oculta botones "Agregar al Carrito"
-
-Se inyecta CSS inline condicional que oculta los botones `.action.tocart` y `#product-addtocart-button` en:
-- Listado de categorias
-- Pagina de producto
-- Resultados de busqueda
-- Widgets de productos
-
-### 2. Bloquea agregar al carrito (backend)
-
-**Primera capa:** Plugin `around` sobre `Magento\Checkout\Controller\Cart\Add::execute`
-- Si es una peticion AJAX: responde JSON con `error: true` y el mensaje configurado
-- Si es peticion normal: redirect al referer con mensaje de error en message manager
-
-**Segunda capa:** Plugin `before` sobre `Magento\Quote\Model\Quote::addProduct`
-- Lanza `LocalizedException` con el mensaje (texto plano)
-- Cubre cualquier punto de entrada que use el modelo Quote directamente
-
-### 3. Bloquea el checkout (opcional)
-
-Si "Deshabilitar tambien el Checkout" esta en Si:
-
-- Plugin `around` sobre `Magento\Checkout\Controller\Index\Index::execute`
-- Plugin `around` sobre `Magento\Checkout\Controller\Onepage\Index::execute`
-- Redirige al carrito con mensaje de error
-
-### 4. Bloquea API REST / GraphQL
-
-Plugin `before` sobre `Magento\Quote\Api\CartItemRepositoryInterface::save`
-- Lanza `LocalizedException` bloqueando la creacion de items via API
-
-### 5. Notificacion visual
-
-Muestra el mensaje configurado al usuario via:
-- **Banner superior**: fijo en la parte superior, descartable, personalizable en colores y CSS
-- **Modal popup**: centrado en pantalla, aparece una vez por sesion, con boton "Entendido"
+**Banner and Modal can be active at the same time.** They are independent of each other.
 
 ---
 
-## Comportamiento cuando esta desactivado
+## What the module does when active
 
-Cuando **Habilitar = No**:
-- No se ejecuta ninguna logica en los plugins (early return inmediato)
-- No se inyecta CSS ni JS
-- No se renderizan los templates de banner ni modal
-- **Impacto en performance: cero**
+### 1. Hides "Add to Cart" buttons
 
-El modulo es **100% reversible**: con solo poner Habilitar = No y limpiar cache, todo vuelve a la normalidad. No modifica tablas de base de datos, no crea crons ni observers.
+Conditional inline CSS hides `.action.tocart` and `#product-addtocart-button` buttons on:
+- Category listing pages
+- Product pages
+- Search results
+- Product widgets
+
+### 2. Blocks add-to-cart (backend)
+
+**First layer:** `around` plugin on `Magento\Checkout\Controller\Cart\Add::execute`
+- AJAX requests: responds with JSON `error: true` and the configured message
+- Standard requests: redirects to referer with error message in message manager
+
+**Second layer:** `before` plugin on `Magento\Quote\Model\Quote::addProduct`
+- Throws `LocalizedException` with the message (plain text)
+- Covers any entry point using the Quote model directly
+
+### 3. Blocks checkout (optional)
+
+If "Also Disable Checkout" is set to Yes:
+
+- `around` plugin on `Magento\Checkout\Controller\Index\Index::execute`
+- `around` plugin on `Magento\Checkout\Controller\Onepage\Index::execute`
+- Redirects to cart with error message
+
+### 4. Blocks REST API / GraphQL
+
+`before` plugin on `Magento\Quote\Api\CartItemRepositoryInterface::save`
+- Throws `LocalizedException` blocking item creation via API
+
+### 5. Visual notification
+
+Displays the configured message to users via:
+- **Top banner**: fixed at the top, dismissible, customizable colors and CSS
+- **Modal popup**: centered on screen, appears once per session, with "Got it" button
 
 ---
 
-## Arquitectura tecnica
+## Behavior when disabled
 
-### Estructura de archivos
+When **Enable = No**:
+- No plugin logic is executed (immediate early return)
+- No CSS or JS is injected
+- Banner and modal templates are not rendered
+- **Performance impact: zero**
+
+The module is **100% reversible**: simply set Enable = No and flush cache, everything returns to normal. No database tables are modified, no crons or observers are created.
+
+---
+
+## Technical architecture
+
+### File structure
 
 ```
 app/code/Rollpix/DisableSales/
@@ -144,44 +148,44 @@ app/code/Rollpix/DisableSales/
 ├── composer.json
 ├── etc/
 │   ├── module.xml
-│   ├── di.xml                          # Plugins globales (API, Quote)
-│   ├── config.xml                      # Valores por defecto
-│   ├── acl.xml                         # Recurso ACL
+│   ├── di.xml                          # Global plugins (API, Quote)
+│   ├── config.xml                      # Default values
+│   ├── acl.xml                         # ACL resource
 │   ├── frontend/
-│   │   └── di.xml                      # Plugins frontend (Cart, Checkout)
+│   │   └── di.xml                      # Frontend plugins (Cart, Checkout)
 │   └── adminhtml/
-│       └── system.xml                  # Configuracion del admin
+│       └── system.xml                  # Admin configuration
 ├── i18n/
-│   └── es_AR.csv                       # Traduccion español Argentina
+│   └── es_AR.csv                       # Spanish (Argentina) translation
 ├── Model/
-│   └── Config.php                      # Lectura de configuracion via ScopeConfig
+│   └── Config.php                      # Config reading via ScopeConfig
 ├── Plugin/
 │   ├── Cart/
-│   │   └── AddPlugin.php              # Bloquea Cart\Add::execute
+│   │   └── AddPlugin.php              # Blocks Cart\Add::execute
 │   ├── Quote/
-│   │   └── AddProductPlugin.php       # Bloquea Quote::addProduct
+│   │   └── AddProductPlugin.php       # Blocks Quote::addProduct
 │   ├── Checkout/
-│   │   └── DisableCheckoutPlugin.php  # Bloquea acceso al checkout
+│   │   └── DisableCheckoutPlugin.php  # Blocks checkout access
 │   └── Api/
-│       └── CartItemRepositoryPlugin.php # Bloquea API REST/GraphQL
+│       └── CartItemRepositoryPlugin.php # Blocks REST API/GraphQL
 ├── ViewModel/
-│   └── SalesStatus.php                # Expone config al frontend
+│   └── SalesStatus.php                # Exposes config to frontend
 ├── view/
 │   └── frontend/
 │       ├── layout/
-│       │   └── default.xml            # Inyecta bloques en todas las paginas
+│       │   └── default.xml            # Injects blocks on all pages
 │       ├── templates/
-│       │   ├── banner.phtml           # Template del banner superior
-│       │   └── modal.phtml            # Template del modal popup
+│       │   ├── banner.phtml           # Top banner template
+│       │   └── modal.phtml            # Modal popup template
 │       └── web/
 │           └── js/
-│               └── disable-sales-modal.js  # JS del modal (RequireJS)
+│               └── disable-sales-modal.js  # Modal JS (RequireJS)
 └── README.md
 ```
 
-### Plugins utilizados
+### Plugins
 
-| Plugin | Tipo | Scope | Clase interceptada |
+| Plugin | Type | Scope | Intercepted class |
 |---|---|---|---|
 | AddPlugin | around | frontend | `Magento\Checkout\Controller\Cart\Add` |
 | AddProductPlugin | before | global | `Magento\Quote\Model\Quote` |
@@ -190,7 +194,7 @@ app/code/Rollpix/DisableSales/
 
 ### ViewModel
 
-`Rollpix\DisableSales\ViewModel\SalesStatus` expone al frontend:
+`Rollpix\DisableSales\ViewModel\SalesStatus` exposes to frontend:
 - `isDisabled()`: bool
 - `getMessage()`: string
 - `isBannerEnabled()` / `isModalEnabled()`: bool
@@ -199,41 +203,41 @@ app/code/Rollpix/DisableSales/
 
 ### ACL
 
-Recurso: `Rollpix_DisableSales::config` bajo `Magento_Config::config`
+Resource: `Rollpix_DisableSales::config` under `Magento_Config::config`
 
 ---
 
-## Guia de testing manual
+## Manual testing guide
 
-1. **Activar el modulo** en admin (Habilitar = Si) → Guardar configuracion → Limpiar cache
-   - Verificar que los botones "Agregar al Carrito" desaparecen en categorias, producto, busqueda
-   - Verificar que aparece el banner superior (si esta habilitado)
-   - Verificar que aparece el modal (si esta habilitado)
+1. **Enable the module** in admin (Enable = Yes) → Save configuration → Flush cache
+   - Verify "Add to Cart" buttons disappear on category, product, and search pages
+   - Verify the top banner appears (if enabled)
+   - Verify the modal appears (if enabled)
 
-2. **Intentar agregar al carrito via URL directa** (`/checkout/cart/add/product/ID/`)
-   - Verificar que se bloquea y muestra el mensaje de error
+2. **Try adding to cart via direct URL** (`/checkout/cart/add/product/ID/`)
+   - Verify it is blocked and shows the error message
 
-3. **Intentar acceder al checkout** con productos en el carrito
-   - Verificar que redirige al carrito con mensaje de error
+3. **Try accessing checkout** with products in cart
+   - Verify it redirects to cart with error message
 
-4. **Desactivar el modulo** (Habilitar = No) → Limpiar cache
-   - Verificar que todo vuelve a funcionar normalmente
+4. **Disable the module** (Enable = No) → Flush cache
+   - Verify everything returns to normal
 
-5. **Cambiar mensaje, colores y CSS** → Limpiar cache
-   - Verificar que los cambios se reflejan en el frontend
+5. **Change message, colors and CSS** → Flush cache
+   - Verify changes are reflected on the frontend
 
-6. **Probar boton cerrar del banner** (X)
-   - Verificar que no se muestra de nuevo al navegar (localStorage)
+6. **Test banner close button** (X)
+   - Verify it doesn't show again when navigating (localStorage)
 
-7. **Probar modal en modo incognito**
-   - Verificar que aparece una vez y no vuelve a mostrarse en la sesion (sessionStorage)
+7. **Test modal in incognito mode**
+   - Verify it appears once and doesn't reappear in the session (sessionStorage)
 
-8. **Probar banner + modal juntos**
-   - Activar ambos y verificar que coexisten correctamente
+8. **Test banner + modal together**
+   - Enable both and verify they coexist correctly
 
 ---
 
-## Desinstalacion
+## Uninstall
 
 ```bash
 bin/magento module:disable Rollpix_DisableSales
@@ -241,12 +245,12 @@ bin/magento setup:upgrade
 bin/magento cache:flush
 ```
 
-Luego eliminar la carpeta `app/code/Rollpix/DisableSales`.
+Then remove the `app/code/Rollpix/DisableSales` folder.
 
-No se crean ni modifican tablas de base de datos. No quedan residuos.
+No database tables are created or modified. No residue left behind.
 
 ---
 
-## Licencia
+## License
 
 MIT
