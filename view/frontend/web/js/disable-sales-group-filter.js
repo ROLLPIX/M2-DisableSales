@@ -9,7 +9,6 @@ define([
     'use strict';
 
     var applied = false;
-    var guestInterceptAttached = false;
 
     function addHideTocartStyle() {
         if (!$('#rollpix-hide-tocart-style').length) {
@@ -39,34 +38,10 @@ define([
         });
     }
 
-    /**
-     * For guests whose group is restricted: intercept AJAX add-to-cart responses.
-     * When the server blocks it, show the banner so the guest understands why.
-     */
-    function attachGuestAddToCartIntercept() {
-        if (guestInterceptAttached) {
-            return;
-        }
-        guestInterceptAttached = true;
-
-        $(document).ajaxComplete(function (event, xhr, settings) {
-            if (!settings.url || settings.url.indexOf('checkout/cart/add') === -1) {
-                return;
-            }
-            try {
-                var response = JSON.parse(xhr.responseText);
-                if (response.rollpix_sales_disabled) {
-                    showBanner();
-                }
-            } catch (e) {
-                // not JSON, ignore
-            }
-        });
-    }
-
     return function (config) {
         var restrictedGroups = config.restrictedGroups || [];
         var bannerEnabled = config.bannerEnabled || false;
+        var showOnLogin = config.bannerShowOnLogin || false;
 
         function applyRestrictions(customerInfo) {
             var isLoggedIn = !!(customerInfo && customerInfo.firstname);
@@ -76,28 +51,21 @@ define([
             var isRestricted = (restrictedGroups.length === 0) || (restrictedGroups.indexOf(groupId) !== -1);
 
             // --- Add-to-cart button hiding ---
-            if (isRestricted && isLoggedIn) {
+            if (isRestricted) {
                 addHideTocartStyle();
             } else {
                 removeHideTocartStyle();
             }
 
             // --- Banner visibility ---
-            if (bannerEnabled) {
-                if (isRestricted && isLoggedIn) {
-                    // Logged-in restricted: show banner immediately
+            if (bannerEnabled && isRestricted) {
+                if (!showOnLogin || isLoggedIn) {
                     showBanner();
                 }
+            }
 
-                // Attach close handler once
-                if (!applied) {
-                    attachBannerCloseHandler();
-                }
-
-                // Guest with group 0 restricted: show banner on failed add-to-cart
-                if (!isLoggedIn && restrictedGroups.indexOf(0) !== -1) {
-                    attachGuestAddToCartIntercept();
-                }
+            if (bannerEnabled && !applied) {
+                attachBannerCloseHandler();
             }
 
             applied = true;

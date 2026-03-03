@@ -58,12 +58,7 @@ define([
             var isLoggedIn = !!(customerInfo && customerInfo.firstname);
             var groupId = isLoggedIn ? parseInt(customerInfo.group_id, 10) : 0;
 
-            // Guests (group 0): never show modal (server handles blocking)
-            if (!isLoggedIn) {
-                return;
-            }
-
-            // Show on login check
+            // Show on login: only show for logged-in users
             if (showOnLogin && !isLoggedIn) {
                 return;
             }
