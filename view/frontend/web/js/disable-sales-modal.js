@@ -1,10 +1,11 @@
 define([
     'jquery',
-    'Magento_Ui/js/modal/modal'
-], function ($, modal) {
+    'Magento_Ui/js/modal/modal',
+    'Magento_Customer/js/customer-data'
+], function ($, modal, customerData) {
     'use strict';
 
-    return function () {
+    function showModal() {
         if (sessionStorage.getItem('rollpix_modal_shown') === '1') {
             return;
         }
@@ -33,5 +34,53 @@ define([
 
         modal(options, $modalEl);
         $modalEl.modal('openModal');
+    }
+
+    return function (config) {
+        config = config || {};
+
+        if (!config.groupFilterEnabled) {
+            // MODE 1: Legacy — show immediately
+            showModal();
+            return;
+        }
+
+        // MODE 2: Group filter — check customer group before showing
+        var restrictedGroups = config.restrictedGroups || [];
+        var showOnLogin = config.showOnLogin || false;
+        var shown = false;
+
+        function evaluate(customerInfo) {
+            if (shown) {
+                return;
+            }
+
+            var isLoggedIn = !!(customerInfo && customerInfo.firstname);
+            var groupId = isLoggedIn ? parseInt(customerInfo.group_id, 10) : 0;
+
+            // Guests (group 0): never show modal (server handles blocking)
+            if (!isLoggedIn) {
+                return;
+            }
+
+            // Show on login check
+            if (showOnLogin && !isLoggedIn) {
+                return;
+            }
+
+            // Check if customer's group is restricted
+            var isRestricted = (restrictedGroups.length === 0) || (restrictedGroups.indexOf(groupId) !== -1);
+
+            if (isRestricted) {
+                shown = true;
+                showModal();
+            }
+        }
+
+        var customer = customerData.get('customer');
+        customer.subscribe(function (data) {
+            evaluate(data);
+        });
+        evaluate(customer());
     };
 });

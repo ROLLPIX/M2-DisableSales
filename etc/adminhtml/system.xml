@@ -27,6 +27,16 @@
                     <comment>Block checkout access as an additional safety net.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="customer_groups" translate="label comment" type="multiselect" sortOrder="26"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Restrict to Customer Groups</label>
+                    <comment><![CDATA[Select which customer groups will have sales disabled. Leave empty to apply to ALL customers.]]></comment>
+                    <source_model>Rollpix\DisableSales\Model\Config\Source\CustomerGroup</source_model>
+                    <can_be_empty>1</can_be_empty>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
             </group>
             <group id="banner" translate="label" sortOrder="20" showInDefault="1"
                    showInWebsite="1" showInStore="1">
@@ -36,6 +46,15 @@
                     <label>Show Top Banner</label>
                     <comment>Display a dismissible banner at the top of the page.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="show_on_login" translate="label comment" type="select" sortOrder="12"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Only After Login</label>
+                    <comment>When enabled, the banner is only shown to logged-in customers. Guests will not see it.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="show_banner">1</field>
+                    </depends>
                 </field>
                 <field id="banner_bg_color" translate="label" type="text" sortOrder="20"
                        showInDefault="1" showInWebsite="1" showInStore="1">
@@ -70,6 +89,15 @@
                     <label>Show Modal</label>
                     <comment>Display a modal popup once per session.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="show_on_login" translate="label comment" type="select" sortOrder="12"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Only After Login</label>
+                    <comment>When enabled, the modal is only shown to logged-in customers. Guests will not see it.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="show_modal">1</field>
+                    </depends>
                 </field>
                 <field id="modal_bg_color" translate="label" type="text" sortOrder="20"
                        showInDefault="1" showInWebsite="1" showInStore="1">

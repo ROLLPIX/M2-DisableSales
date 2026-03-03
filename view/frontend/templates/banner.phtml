@@ -15,9 +15,13 @@ $showBanner = $salesStatus->isBannerEnabled();
 $bgColor = $escaper->escapeHtmlAttr($salesStatus->getBannerBgColor());
 $textColor = $escaper->escapeHtmlAttr($salesStatus->getBannerTextColor());
 $bannerCss = $escaper->escapeHtmlAttr($salesStatus->getBannerCustomCss());
+$hasGroupFilter = $salesStatus->hasCustomerGroupFilter();
+$bannerShowOnLogin = $salesStatus->isBannerShowOnLogin();
+$useJsMode = $hasGroupFilter || $bannerShowOnLogin;
 ?>
 
-<?php // Hide add-to-cart buttons via inline CSS ?>
+<?php if (!$useJsMode): ?>
+<?php // MODE 1: No group filter, no show_on_login — legacy server-side CSS hiding ?>
 <style>
     .action.tocart,
     #product-addtocart-button,
@@ -26,6 +30,7 @@ $bannerCss = $escaper->escapeHtmlAttr($salesStatus->getBannerCustomCss());
         display: none !important;
     }
 </style>
+<?php endif; ?>
 
 <?php if ($showBanner): ?>
 <div id="rollpix-disable-sales-banner"
@@ -34,7 +39,7 @@ $bannerCss = $escaper->escapeHtmlAttr($salesStatus->getBannerCustomCss());
             padding: 12px 40px 12px 20px;
             text-align: center;
             position: relative;
-            z-index: 1000;">
+            z-index: 1000;<?php if ($useJsMode): ?> display: none;<?php endif; ?>">
     <span<?php if ($bannerCss): ?> style="<?= /* @noEscape */ $bannerCss ?>"<?php endif; ?>><?= /* @noEscape */ $message ?></span>
     <button type="button"
             id="rollpix-disable-sales-close"
@@ -54,6 +59,7 @@ $bannerCss = $escaper->escapeHtmlAttr($salesStatus->getBannerCustomCss());
         &times;
     </button>
 </div>
+<?php if (!$useJsMode): ?>
 <script>
     (function () {
         var banner = document.getElementById('rollpix-disable-sales-banner');
@@ -66,5 +72,20 @@ $bannerCss = $escaper->escapeHtmlAttr($salesStatus->getBannerCustomCss());
             localStorage.setItem('rollpix_banner_closed', '1');
         });
     })();
+</script>
+<?php endif; ?>
+<?php endif; ?>
+
+<?php if ($useJsMode): ?>
+<script type="text/x-magento-init">
+{
+    "*": {
+        "Rollpix_DisableSales/js/disable-sales-group-filter": {
+            "restrictedGroups": <?= /* @noEscape */ $salesStatus->getRestrictedCustomerGroupsJson() ?>,
+            "bannerEnabled": <?= $showBanner ? 'true' : 'false' ?>,
+            "bannerShowOnLogin": <?= $bannerShowOnLogin ? 'true' : 'false' ?>
+        }
+    }
+}
 </script>
 <?php endif; ?>

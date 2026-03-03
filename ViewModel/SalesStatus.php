@@ -29,11 +29,28 @@ class SalesStatus implements ArgumentInterface
         return $this->config->getMessage();
     }
 
+    // --- Customer Groups ---
+
+    public function hasCustomerGroupFilter(): bool
+    {
+        return $this->config->hasCustomerGroupFilter();
+    }
+
+    public function getRestrictedCustomerGroupsJson(): string
+    {
+        return json_encode($this->config->getRestrictedCustomerGroups());
+    }
+
     // --- Banner ---
 
     public function isBannerEnabled(): bool
     {
         return $this->config->isBannerEnabled();
+    }
+
+    public function isBannerShowOnLogin(): bool
+    {
+        return $this->config->isBannerShowOnLogin();
     }
 
     public function getBannerBgColor(): string
@@ -56,6 +73,11 @@ class SalesStatus implements ArgumentInterface
     public function isModalEnabled(): bool
     {
         return $this->config->isModalEnabled();
+    }
+
+    public function isModalShowOnLogin(): bool
+    {
+        return $this->config->isModalShowOnLogin();
     }
 
     public function getModalBgColor(): string

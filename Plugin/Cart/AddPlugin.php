@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Rollpix\DisableSales\Plugin\Cart;
 
 use Magento\Checkout\Controller\Cart\Add;
+use Magento\Customer\Model\Session\Proxy as CustomerSession;
 use Magento\Framework\App\Response\RedirectInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\ResultInterface;
@@ -33,16 +34,23 @@ class AddPlugin
      */
     private $jsonFactory;
 
+    /**
+     * @var CustomerSession
+     */
+    private $customerSession;
+
     public function __construct(
         Config $config,
         ManagerInterface $messageManager,
         RedirectInterface $redirect,
-        JsonFactory $jsonFactory
+        JsonFactory $jsonFactory,
+        CustomerSession $customerSession
     ) {
         $this->config = $config;
         $this->messageManager = $messageManager;
         $this->redirect = $redirect;
         $this->jsonFactory = $jsonFactory;
+        $this->customerSession = $customerSession;
     }
 
     /**
@@ -51,6 +59,12 @@ class AddPlugin
     public function aroundExecute(Add $subject, callable $proceed): ResultInterface
     {
         if (!$this->config->isEnabled()) {
+            return $proceed();
+        }
+
+        $customerGroupId = (int) $this->customerSession->getCustomerGroupId();
+
+        if (!$this->config->isSalesDisabledForGroup($customerGroupId)) {
             return $proceed();
         }
 

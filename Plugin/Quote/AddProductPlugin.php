@@ -36,7 +36,11 @@ class AddProductPlugin
         $request = null
     ): array {
         if ($this->config->isEnabled()) {
-            throw new LocalizedException(__(strip_tags($this->config->getMessage())));
+            $customerGroupId = (int) $subject->getCustomerGroupId();
+
+            if ($this->config->isSalesDisabledForGroup($customerGroupId)) {
+                throw new LocalizedException(__(strip_tags($this->config->getMessage())));
+            }
         }
 
         return [$product, $request];
