@@ -73,13 +73,9 @@ class AddPlugin
         $request = $subject->getRequest();
         if ($request->isAjax() || $request->getParam('is_ajax')) {
             $result = $this->jsonFactory->create();
-            $messagesHtml = '<div class="messages">'
-                . '<div class="message message-error error">'
-                . '<div data-ui-id="message-error">'
-                . htmlspecialchars($plainMessage)
-                . '</div></div></div>';
+            $result->setHttpResponseCode(400);
             return $result->setData([
-                'messages' => $messagesHtml,
+                'message' => $plainMessage,
                 'rollpix_sales_disabled' => true,
             ]);
         }
