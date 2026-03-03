@@ -9,6 +9,7 @@ define([
     'use strict';
 
     var applied = false;
+    var guestInterceptAttached = false;
 
     function addHideTocartStyle() {
         if (!$('#rollpix-hide-tocart-style').length) {
@@ -24,10 +25,48 @@ define([
         $('#rollpix-hide-tocart-style').remove();
     }
 
+    function showBanner() {
+        var $banner = $('#rollpix-disable-sales-banner');
+        if ($banner.length && localStorage.getItem('rollpix_banner_closed') !== '1') {
+            $banner.show();
+        }
+    }
+
+    function attachBannerCloseHandler() {
+        $('#rollpix-disable-sales-close').on('click', function () {
+            $('#rollpix-disable-sales-banner').hide();
+            localStorage.setItem('rollpix_banner_closed', '1');
+        });
+    }
+
+    /**
+     * For guests whose group is restricted: intercept AJAX add-to-cart responses.
+     * When the server blocks it, show the banner so the guest understands why.
+     */
+    function attachGuestAddToCartIntercept() {
+        if (guestInterceptAttached) {
+            return;
+        }
+        guestInterceptAttached = true;
+
+        $(document).ajaxComplete(function (event, xhr, settings) {
+            if (!settings.url || settings.url.indexOf('checkout/cart/add') === -1) {
+                return;
+            }
+            try {
+                var response = JSON.parse(xhr.responseText);
+                if (response.rollpix_sales_disabled) {
+                    showBanner();
+                }
+            } catch (e) {
+                // not JSON, ignore
+            }
+        });
+    }
+
     return function (config) {
         var restrictedGroups = config.restrictedGroups || [];
         var bannerEnabled = config.bannerEnabled || false;
-        var bannerShowOnLogin = config.bannerShowOnLogin || false;
 
         function applyRestrictions(customerInfo) {
             var isLoggedIn = !!(customerInfo && customerInfo.firstname);
@@ -45,25 +84,19 @@ define([
 
             // --- Banner visibility ---
             if (bannerEnabled) {
-                var $banner = $('#rollpix-disable-sales-banner');
-                var $closeBtn = $('#rollpix-disable-sales-close');
+                if (isRestricted && isLoggedIn) {
+                    // Logged-in restricted: show banner immediately
+                    showBanner();
+                }
 
-                if ($banner.length) {
-                    var showBanner = isRestricted && isLoggedIn;
+                // Attach close handler once
+                if (!applied) {
+                    attachBannerCloseHandler();
+                }
 
-                    if (showBanner && localStorage.getItem('rollpix_banner_closed') !== '1') {
-                        $banner.show();
-                    } else {
-                        $banner.hide();
-                    }
-
-                    // Attach close handler once
-                    if (!applied) {
-                        $closeBtn.on('click', function () {
-                            $banner.hide();
-                            localStorage.setItem('rollpix_banner_closed', '1');
-                        });
-                    }
+                // Guest with group 0 restricted: show banner on failed add-to-cart
+                if (!isLoggedIn && restrictedGroups.indexOf(0) !== -1) {
+                    attachGuestAddToCartIntercept();
                 }
             }
 
