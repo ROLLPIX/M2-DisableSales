@@ -9,7 +9,6 @@ define([
     'use strict';
 
     var bannerCloseHandlerAttached = false;
-    var lastLoginState = null;
 
     function addHideTocartStyle() {
         if (!$('#rollpix-hide-tocart-style').length) {
@@ -32,10 +31,6 @@ define([
         }
     }
 
-    function hideBanner() {
-        $('#rollpix-disable-sales-banner').hide();
-    }
-
     function attachBannerCloseHandler() {
         if (bannerCloseHandlerAttached) {
             return;
@@ -56,11 +51,10 @@ define([
             var isLoggedIn = !!(customerInfo && customerInfo.firstname);
             var groupId = isLoggedIn ? parseInt(customerInfo.group_id, 10) : 0;
 
-            // Reset banner dismissed state when login state changes
-            if (lastLoginState !== null && lastLoginState !== isLoggedIn) {
-                localStorage.removeItem('rollpix_banner_closed');
+            // Guard against NaN from missing group_id in cached section data
+            if (isNaN(groupId)) {
+                groupId = 0;
             }
-            lastLoginState = isLoggedIn;
 
             // Determine if this customer's group is restricted
             var isRestricted = (restrictedGroups.length === 0) || (restrictedGroups.indexOf(groupId) !== -1);
@@ -73,14 +67,12 @@ define([
             }
 
             // --- Banner visibility ---
-            if (bannerEnabled) {
+            // Only show, never actively hide. The banner starts hidden in JS mode
+            // (display:none in HTML). Login/logout triggers a page reload so it resets.
+            // The close button (X) is the only way to dismiss it.
+            if (bannerEnabled && isRestricted && (!showOnLogin || isLoggedIn)) {
                 attachBannerCloseHandler();
-
-                if (isRestricted && (!showOnLogin || isLoggedIn)) {
-                    showBanner();
-                } else {
-                    hideBanner();
-                }
+                showBanner();
             }
         }
 
@@ -95,7 +87,6 @@ define([
         applyRestrictions(customer());
 
         // Re-evaluate after Magento finishes loading/refreshing section data
-        // (handles race condition where sections refresh before subscribe is set up)
         if (typeof customerData.getInitCustomerData === 'function') {
             customerData.getInitCustomerData().done(function () {
                 applyRestrictions(customer());
