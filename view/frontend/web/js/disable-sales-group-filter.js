@@ -10,6 +10,20 @@ define([
 
     var applied = false;
 
+    function addHideTocartStyle() {
+        if (!$('#rollpix-hide-tocart-style').length) {
+            $('<style id="rollpix-hide-tocart-style">' +
+                '.action.tocart, #product-addtocart-button, ' +
+                'button.action.tocart, .product-item-actions .action.tocart ' +
+                '{ display: none !important; }' +
+                '</style>').appendTo('head');
+        }
+    }
+
+    function removeHideTocartStyle() {
+        $('#rollpix-hide-tocart-style').remove();
+    }
+
     return function (config) {
         var restrictedGroups = config.restrictedGroups || [];
         var bannerEnabled = config.bannerEnabled || false;
@@ -20,16 +34,12 @@ define([
             var groupId = isLoggedIn ? parseInt(customerInfo.group_id, 10) : 0;
 
             // Determine if this customer's group is restricted
-            // Empty restrictedGroups = all groups (but in JS mode this means groups were set via config)
             var isRestricted = (restrictedGroups.length === 0) || (restrictedGroups.indexOf(groupId) !== -1);
 
             // --- Add-to-cart button hiding ---
             if (isRestricted && isLoggedIn) {
-                // Logged-in restricted: hide add-to-cart via dynamic CSS
                 addHideTocartStyle();
             } else {
-                // Guests: keep add-to-cart visible (server-side blocks on click)
-                // Non-restricted: keep add-to-cart visible
                 removeHideTocartStyle();
             }
 
@@ -39,13 +49,7 @@ define([
                 var $closeBtn = $('#rollpix-disable-sales-close');
 
                 if ($banner.length) {
-                    var showBanner = false;
-
-                    if (isRestricted && isLoggedIn) {
-                        if (!bannerShowOnLogin || isLoggedIn) {
-                            showBanner = true;
-                        }
-                    }
+                    var showBanner = isRestricted && isLoggedIn;
 
                     if (showBanner && localStorage.getItem('rollpix_banner_closed') !== '1') {
                         $banner.show();

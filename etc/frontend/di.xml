@@ -8,6 +8,13 @@
                 sortOrder="10"/>
     </type>
 
+    <!-- Add group_id to customer section data for frontend JS -->
+    <type name="Magento\Customer\CustomerData\Customer">
+        <plugin name="rollpix_disablesales_customer_data_group"
+                type="Rollpix\DisableSales\Plugin\CustomerData\CustomerPlugin"
+                sortOrder="10"/>
+    </type>
+
     <!-- Block checkout page access -->
     <type name="Magento\Checkout\Controller\Index\Index">
         <plugin name="rollpix_disablesales_checkout_index"
