@@ -73,9 +73,18 @@ define([
         }
 
         var customer = customerData.get('customer');
+
         customer.subscribe(function (data) {
             evaluate(data);
         });
+
         evaluate(customer());
+
+        // Re-evaluate after Magento finishes loading/refreshing section data
+        if (typeof customerData.getInitCustomerData === 'function') {
+            customerData.getInitCustomerData().done(function () {
+                evaluate(customer());
+            });
+        }
     };
 });

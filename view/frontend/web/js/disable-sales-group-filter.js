@@ -8,7 +8,8 @@ define([
 ], function ($, customerData) {
     'use strict';
 
-    var applied = false;
+    var bannerCloseHandlerAttached = false;
+    var lastLoginState = null;
 
     function addHideTocartStyle() {
         if (!$('#rollpix-hide-tocart-style').length) {
@@ -31,8 +32,16 @@ define([
         }
     }
 
+    function hideBanner() {
+        $('#rollpix-disable-sales-banner').hide();
+    }
+
     function attachBannerCloseHandler() {
-        $('#rollpix-disable-sales-close').on('click', function () {
+        if (bannerCloseHandlerAttached) {
+            return;
+        }
+        bannerCloseHandlerAttached = true;
+        $(document).on('click', '#rollpix-disable-sales-close', function () {
             $('#rollpix-disable-sales-banner').hide();
             localStorage.setItem('rollpix_banner_closed', '1');
         });
@@ -47,6 +56,12 @@ define([
             var isLoggedIn = !!(customerInfo && customerInfo.firstname);
             var groupId = isLoggedIn ? parseInt(customerInfo.group_id, 10) : 0;
 
+            // Reset banner dismissed state when login state changes
+            if (lastLoginState !== null && lastLoginState !== isLoggedIn) {
+                localStorage.removeItem('rollpix_banner_closed');
+            }
+            lastLoginState = isLoggedIn;
+
             // Determine if this customer's group is restricted
             var isRestricted = (restrictedGroups.length === 0) || (restrictedGroups.indexOf(groupId) !== -1);
 
@@ -58,23 +73,40 @@ define([
             }
 
             // --- Banner visibility ---
-            if (bannerEnabled && isRestricted) {
-                if (!showOnLogin || isLoggedIn) {
+            if (bannerEnabled) {
+                attachBannerCloseHandler();
+
+                if (isRestricted && (!showOnLogin || isLoggedIn)) {
                     showBanner();
+                } else {
+                    hideBanner();
                 }
             }
-
-            if (bannerEnabled && !applied) {
-                attachBannerCloseHandler();
-            }
-
-            applied = true;
         }
 
         var customer = customerData.get('customer');
+
+        // React to section data changes (login/logout)
         customer.subscribe(function (data) {
             applyRestrictions(data);
         });
+
+        // Initial evaluation
         applyRestrictions(customer());
+
+        // Re-evaluate after Magento finishes loading/refreshing section data
+        // (handles race condition where sections refresh before subscribe is set up)
+        if (typeof customerData.getInitCustomerData === 'function') {
+            customerData.getInitCustomerData().done(function () {
+                applyRestrictions(customer());
+            });
+        }
+
+        // Handle browser back-forward cache restoration
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                applyRestrictions(customer());
+            }
+        });
     };
 });
